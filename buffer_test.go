@@ -1,4 +1,4 @@
-package spmcb
+package spms
 
 import (
 	"strconv"
@@ -17,7 +17,7 @@ func TestNewBuffer(t *testing.T) {
 		return
 	}
 	for i := 0; i < size+1; i++ {
-		if err := sb.Produce(strconv.Itoa(i)); err != nil {
+		if err := sb.Publish(strconv.Itoa(i)); err != nil {
 			t.Errorf("Produce new value failed: %v", err)
 			return
 		}
@@ -41,26 +41,26 @@ func TestNewBuffer(t *testing.T) {
 	}
 }
 
-func TestNewConsumer(t *testing.T) {
+func TestNewSubscriber(t *testing.T) {
 	size := 10
 	sb, err := New[int](size)
 	if err != nil {
 		t.Errorf("Create new buffer failed: %v\n", err)
 		return
 	}
-	cs, err := NewConsumer(sb)
+	cs, err := NewSubscriber(sb)
 	if err != nil {
-		t.Errorf("Create new consumer failed: %v\n", err)
+		t.Errorf("Create new subscriber failed: %v\n", err)
 		return
 	}
-	sb.Produce(1)
-	v, err := cs.Consume()
+	sb.Publish(1)
+	v, err := cs.Read()
 	if err != nil {
-		t.Errorf("Consume a buffer failed: %v\n", err)
+		t.Errorf("Read a buffer failed: %v\n", err)
 		return
 	}
 	if v != 1 {
-		t.Errorf("Consume buffer result not match, expect: %d, got: %d\n", 1, v)
+		t.Errorf("Read buffer result not match, expect: %d, got: %d\n", 1, v)
 		return
 	}
 }

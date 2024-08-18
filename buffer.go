@@ -1,4 +1,4 @@
-package spmcb
+package spms
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ func New[T any](size int) (*Buffer[T], error) {
 	return b, nil
 }
 
-func (rb *Buffer[T]) Produce(v T) error {
+func (rb *Buffer[T]) Publish(v T) error {
 	if rb == nil {
 		return ErrNilBuffer
 	}
@@ -43,16 +43,16 @@ func (rb *Buffer[T]) Produce(v T) error {
 	return nil
 }
 
-type Consumer[T any] struct {
+type Subscriber[T any] struct {
 	rb   *Buffer[T]
 	ridx atomic.Int64
 }
 
-func NewConsumer[T any](rb *Buffer[T]) (*Consumer[T], error) {
+func NewSubscriber[T any](rb *Buffer[T]) (*Subscriber[T], error) {
 	if rb == nil {
 		return nil, ErrNilBuffer
 	}
-	c := &Consumer[T]{
+	c := &Subscriber[T]{
 		rb: rb,
 	}
 	ridx := rb.widx.Load() - 1
@@ -63,10 +63,10 @@ func NewConsumer[T any](rb *Buffer[T]) (*Consumer[T], error) {
 	return c, nil
 }
 
-// Consume the buffer
+// Read the buffer
 // It's a non-block method, e.g. it will return error while buffer has no more
 // new items.
-func (c *Consumer[T]) Consume() (T, error) {
+func (c *Subscriber[T]) Read() (T, error) {
 	var t T
 	if c == nil {
 		return t, ErrNilBuffer
